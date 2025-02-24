@@ -1,0 +1,33 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+
+  filkoll:
+    name: "Release filkoll"
+    permissions:
+      attestations: write
+      contents: write
+      id-token: write
+    if: github.repository_owner == 'VorpalBlade' && startsWith(github.event.release.name, 'v')
+    uses: ./.github/workflows/act_build_release.yml
+    with:
+      release_name: ${{ github.event.release.name }}
+      project: filkoll
+      archive_prefix: ${{ github.event.release.name }}
+      binaries: filkoll
+    secrets:
+      AUR_USERNAME: ${{ secrets.AUR_USERNAME }}
+      AUR_EMAIL: ${{ secrets.AUR_EMAIL }}
+      AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}

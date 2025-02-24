@@ -1,0 +1,49 @@
+[package]
+categories = ["command-line-utilities", "filesystem", "os::linux-apis"]
+description = "Find out what package owns a file"
+edition = "2024"
+keywords = ["arch-linux", "pacman", "package-management"]
+license = "GPL-3.0-only"
+name = "filkoll"
+readme = "../../README.md"
+repository = "https://github.com/VorpalBlade/filkoll"
+rust-version = "1.85.0"
+version = "0.1.0"
+
+[dependencies]
+anstream.workspace = true
+anstyle.workspace = true
+camino.workspace = true
+clap.workspace = true
+color-eyre.workspace = true
+compact_str.workspace = true
+eyre.workspace = true
+flate2.workspace = true
+hashbrown.workspace = true
+itertools.workspace = true
+memmap2.workspace = true
+rayon.workspace = true
+regex.workspace = true
+rkyv.workspace = true
+rust-ini.workspace = true
+smallvec.workspace = true
+strsim.workspace = true
+tar.workspace = true
+tracing.workspace = true
+tracing-error.workspace = true
+tracing-subscriber.workspace = true
+type_hash = "0.3.0"
+zerocopy.workspace = true
+
+[target.'cfg(target_env = "musl")'.dependencies]
+# The allocator on musl is attrociously slow, so we use a custom one.
+# Jemalloc doesn't work reliably on Aarch64 due to varying page size, so use
+# the slightly slower mimalloc instead.
+mimalloc.workspace = true
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+indoc.workspace = true
+pretty_assertions.workspace = true

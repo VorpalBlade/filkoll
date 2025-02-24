@@ -1,0 +1,63 @@
+[workspace]
+git_release_enable = false
+
+[[package]]
+name = "xtask"
+release = false
+
+# We only want GH releases for the binaries
+[[package]]
+git_release_enable = true
+git_release_type = "auto"
+name = "filkoll"
+
+[changelog]
+body = """
+{% if version %}\
+    ## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}
+{% else %}\
+    ## [unreleased]
+{% endif %}\
+{% for group, commits in commits | group_by(attribute="group") %}
+    ### {{ group | striptags | trim | upper_first }}
+    {% for commit in commits %}
+        - {% if commit.scope %}*({{ commit.scope }})* {% endif %}\
+            {% if commit.breaking %}[**breaking**] {% endif %}\
+            {{ commit.message | upper_first }}\
+    {% endfor %}
+{% endfor %}\n
+"""
+header = """
+# Changelog\n
+All notable changes to this project will be documented in this file.
+Keep in mind that this is only updated when releases are made and the file
+is generated automatically from commit messages (and may or may not be lightly
+edited).\n
+For a possibly more edited message focused on the binary please see the github
+releases.\n
+"""
+protect_breaking_commits = true
+sort_commits = "newest"
+trim = true
+
+commit_preprocessors = [
+    # remove issue numbers from commits
+    { pattern = '\((\w+\s)?#([0-9]+)\)', replace = "" },
+]
+
+commit_parsers = [
+    { message = "^feat", group = "<!-- 0 -->🚀 Features" },
+    { message = "^fix", group = "<!-- 1 -->🐛 Bug fixes" },
+    { message = "^docs?", group = "<!-- 2 -->📚 Documentation" },
+    { message = "^perf", group = "<!-- 3 -->⚡ Performance improvements" },
+    { message = "^diag", group = "<!-- 4 -->🩺 Diagnostics & output formatting" },
+    { message = "^refactor", group = "<!-- 5 -->🚜 Refactoring" },
+    { message = "^test", group = "<!-- 6 -->🧪 Testing" },
+    { message = "^(churn|chore)\\(release\\): prepare for", skip = true },
+    { message = "^(churn|chore)\\(deps.*\\)", skip = true },
+    { message = "^(churn|chore)\\(pr\\)", skip = true },
+    { message = "^(churn|chore)\\(pull\\)", skip = true },
+    { message = "^churn|chore|ci", group = "<!-- 7 -->⚙️ Other stuff" },
+    { body = ".*security", group = "<!-- 8 -->🛡️ Security" },
+    { message = "^revert", group = "<!-- 9 -->◀️ Revert" },
+]

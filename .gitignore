@@ -1,2 +1,12 @@
+.gdb_history
+.idea
+*.code-workspace
+/.vscode
+/patches
+flamegraph.svg
+heaptrack.*
+memory-profiling_*
 misc/
+perf.data
+perf.data.old
 target/

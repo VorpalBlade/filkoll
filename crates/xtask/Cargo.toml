@@ -1,0 +1,23 @@
+[package]
+description = "Cargo-xtask pattern. Do not upload to crates.io"
+edition = "2024"
+license = "GPL-3.0-only"
+name = "xtask"
+publish = false
+repository = "https://github.com/VorpalBlade/filkoll"
+rust-version = "1.85.0"
+version = "0.1.0"
+
+[dependencies]
+camino.workspace = true
+clap.workspace = true
+clap_complete.workspace = true
+clap_mangen.workspace = true
+color-eyre.workspace = true
+eyre.workspace = true
+filkoll = { workspace = true }
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[lints]
+workspace = true

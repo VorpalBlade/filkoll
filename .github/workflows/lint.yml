@@ -1,0 +1,17 @@
+name: Lint (timer)
+
+on:
+  schedule:
+    - cron: '41 20 * * 1'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  lints:
+    name: "Run lints"
+    uses: ./.github/workflows/act_lint.yml
+    permissions:
+      contents: read
+      security-events: write
