@@ -2,8 +2,17 @@ use std::fs::File;
 use std::hash::Hasher;
 use std::io::Write;
 
+fn find_cargo_lock() -> File {
+    // Deal with differences between workspace and package on crates.io
+    match File::open("../../Cargo.lock") {
+        Ok(file) => file,
+        Err(_) => File::open("Cargo.lock").expect("Failed to open Cargo.lock"),
+    }
+}
+
 fn main() {
-    let cargo_toml_raw = include_str!("../../Cargo.lock");
+    let cargo_toml_raw =
+        std::io::read_to_string(find_cargo_lock()).expect("Failed to read Cargo.lock");
     let mut hasher = std::hash::DefaultHasher::new();
     hasher.write(cargo_toml_raw.as_bytes());
     let hash = hasher.finish();
