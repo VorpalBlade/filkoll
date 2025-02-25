@@ -1,5 +1,18 @@
 [workspace]
 git_release_enable = false
+git_release_body = """
+> [!IMPORTANT]  
+> There are no standalone binary releases as support files must be installed.
+> Use the AUR package. This is the only support method of installation at this point in time.
+
+{{ changelog }}
+{% if remote.contributors %}
+### Contributors
+{% for contributor in remote.contributors %}
+* @{{ contributor.username }}
+{% endfor %}
+{% endif %}
+"""
 
 [[package]]
 name = "xtask"
@@ -7,9 +20,11 @@ release = false
 
 # We only want GH releases for the binaries
 [[package]]
+changelog_path = "CHANGELOG.md"
 git_release_enable = true
 git_release_type = "auto"
 name = "filkoll"
+git_tag_name = "v{{ version }}"
 
 [changelog]
 body = """
