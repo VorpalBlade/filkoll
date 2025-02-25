@@ -75,7 +75,7 @@ jobs:
           PROJECT: ${{ inputs.project }}
       - name: Update PKGBUILD
         run: |
-          sed -i '/^_pkgver/s/=.*$/='${RELEASE_TAG#refs/tags/${PROJECT}-v}'/' "aur/PKGBUILD"
+          sed -i '/^_pkgver/s/=.*$/='${RELEASE_TAG#refs/tags/v}'/' "aur/PKGBUILD"
           sed -i '/^pkgrel/s/=.*$/=1/' "aur/PKGBUILD"
         env:
           PROJECT: ${{ inputs.project }}
