@@ -6,7 +6,8 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart={BINDIR}/filkoll update
+# Use a login shell to get proper PATH set
+ExecStart=/usr/bin/bash --login -c "{BINDIR}/filkoll update"
 
 # Sandboxing
 PrivateUsers=true
