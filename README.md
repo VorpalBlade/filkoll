@@ -1,6 +1,6 @@
 # filkoll
 
-[ [lib.rs] ] [ [crates.io] ] [ [AUR] (TODO) ]
+[ [lib.rs] ] [ [crates.io] ] [ [AUR] ] [ [AUR (git)] ]
 
 Filkoll is:
 
@@ -22,3 +22,4 @@ a breaking change and as such may change even in a patch version.
 [crates.io]: https://crates.io/crates/filkoll
 [lib.rs]: https://lib.rs/crates/filkoll
 [AUR]: https://aur.archlinux.org/packages/filkoll
+[AUR (git)]: https://aur.archlinux.org/packages/filkoll-git
