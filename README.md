@@ -51,6 +51,10 @@ source /usr/share/doc/filkoll/command-not-found.fish
 source /usr/share/doc/filkoll/command-not-found.zsh
 ```
 
+Note, by default the command-not-found handler will not display fuzzy matches
+if there is an exact match. This is especially helpful for short commands
+as there can be many matches.
+
 ## Benchmarks
 
 filkoll is much faster than pkgfile (and this is using an unreleased version
