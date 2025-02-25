@@ -34,8 +34,10 @@ fn main() -> eyre::Result<()> {
         filkoll::cli::Commands::Binary {
             edit_distance,
             search_term,
+            no_fuzzy_if_exact,
         } => {
-            let mut candidates = filkoll::lookup::lookup(edit_distance, &search_term)?;
+            let mut candidates =
+                filkoll::lookup::lookup(edit_distance, no_fuzzy_if_exact, &search_term)?;
             candidates.sort();
             let mut stdout = anstream::stdout().lock();
             let mut maxwidth1 = 0;

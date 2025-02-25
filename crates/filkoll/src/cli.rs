@@ -24,6 +24,9 @@ pub enum Commands {
         /// How fuzzy the search should be (max edit distance)
         #[arg(short, long, default_value = "1")]
         edit_distance: u8,
+        /// Skip fuzzy search if there is an exact match
+        #[arg(short, long)]
+        no_fuzzy_if_exact: bool,
         /// File name to search for in PATH (PATH from the update command is
         /// used)
         #[arg()]

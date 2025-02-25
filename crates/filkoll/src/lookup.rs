@@ -9,7 +9,7 @@ use memmap2::Mmap;
 use std::fs::File;
 use zerocopy::FromBytes;
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Suggestion {
     pub distance: u8,
     pub repo: CompactString,
@@ -39,7 +39,11 @@ impl Suggestion {
 /// Suggestions for search results
 pub type Suggestions = Vec<Suggestion>;
 
-pub fn lookup(edit_distance: u8, search_term: &str) -> eyre::Result<Suggestions> {
+pub fn lookup(
+    edit_distance: u8,
+    no_fuzzy_if_exact: bool,
+    search_term: &str,
+) -> eyre::Result<Suggestions> {
     let files = find_files()?;
 
     if files.is_empty() {
@@ -54,7 +58,21 @@ pub fn lookup(edit_distance: u8, search_term: &str) -> eyre::Result<Suggestions>
         .map(|file| search_in_file(file, search_term, edit_distance))
         .collect::<Result<Vec<_>, _>>()?;
 
-    Ok(results.into_iter().flatten().collect())
+    let results: Vec<Suggestion> = results.into_iter().flatten().collect();
+
+    if no_fuzzy_if_exact {
+        // Filter out any exact matches
+        let exact_matches: Vec<Suggestion> = results
+            .iter()
+            .filter(|suggestion| suggestion.distance == 0)
+            .cloned()
+            .collect();
+        if !exact_matches.is_empty() {
+            return Ok(exact_matches);
+        }
+    }
+
+    Ok(results)
 }
 
 /// Locate *.binaries files in the cache

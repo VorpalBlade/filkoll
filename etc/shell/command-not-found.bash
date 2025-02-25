@@ -4,7 +4,7 @@ command_not_found_handle () {
 
   set +o verbose
 
-  mapfile -t pkgs < <(CLICOLOR_FORCE=1 filkoll binary -- "$cmd" 2>/dev/null)
+  mapfile -t pkgs < <(CLICOLOR_FORCE=1 filkoll binary --no-fuzzy-if-exact -- "$cmd" 2>/dev/null)
 
   if (( ${#pkgs[*]} )); then
     printf '%s may be found in the following packages:\n' "$cmd"

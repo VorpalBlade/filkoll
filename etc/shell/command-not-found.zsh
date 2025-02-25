@@ -1,7 +1,7 @@
 command_not_found_handler() {
   local pkgs cmd="$1"
 
-  pkgs=(${(f)"$(CLICOLOR_FORCE=1 filkoll binary -- "$cmd" 2>/dev/null)"})
+  pkgs=(${(f)"$(CLICOLOR_FORCE=1 filkoll binary --no-fuzzy-if-exact -- "$cmd" 2>/dev/null)"})
   if [[ -n "$pkgs" ]]; then
     printf '%s may be found in the following packages:\n' "$cmd"
     printf '  %s\n' $pkgs[@]
