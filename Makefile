@@ -50,6 +50,7 @@ install-$(PROG): target/release/$(PROG) target/release/xtask etc/systemd/filkoll
 
 install-dirs:
 	install -d \
+		$(DESTDIR)/var/cache/filkoll \
 		$(DESTDIR)$(BASHDIR) \
 		$(DESTDIR)$(BINDIR) \
 		$(DESTDIR)$(DOCDIR) \
