@@ -15,7 +15,7 @@ clap_complete.workspace = true
 clap_mangen.workspace = true
 color-eyre.workspace = true
 eyre.workspace = true
-filkoll = { workspace = true }
+filkoll = { path = "../filkoll" }
 tracing.workspace = true
 tracing-subscriber.workspace = true
 
