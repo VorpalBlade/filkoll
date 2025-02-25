@@ -2,6 +2,7 @@
 .idea
 *.code-workspace
 /.vscode
+/etc/systemd/filkoll-update.service
 /patches
 flamegraph.svg
 heaptrack.*
