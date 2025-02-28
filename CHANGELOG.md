@@ -8,6 +8,16 @@ edited).
 For a possibly more edited message focused on the binary please see the github
 releases.
 
+## [0.2.1] - 2025-02-28
+
+### ⚡ Performance improvements
+
+- Delay UTF-8 until after filtering for PATH when building cache
+
+### 🚜 Refactoring
+
+- Remove unused code
+
 ## [0.2.0] - 2025-02-25
 
 ### 🚀 Features
