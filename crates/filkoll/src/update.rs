@@ -6,6 +6,8 @@ use crate::types::DataRoot;
 use crate::types::DirectoryRef;
 use crate::types::PackageRef;
 use crate::types::Record;
+use bstr::ByteSlice;
+use bstr::io::BufReadExt;
 use camino::Utf8Path;
 use camino::Utf8PathBuf;
 use compact_str::CompactString;
@@ -18,7 +20,6 @@ use rayon::iter::IntoParallelRefIterator;
 use rayon::iter::ParallelIterator;
 use smallvec::SmallVec;
 use std::fs::File;
-use std::io::BufRead;
 use std::io::BufReader;
 use std::io::Write;
 use std::str::FromStr;
@@ -53,7 +54,7 @@ pub fn update(pacman_download: bool) -> eyre::Result<()> {
         })
         .intersperse("|".into())
         .collect::<CompactString>();
-    let prefilter = regex::Regex::new(&prefilter_regex)?;
+    let prefilter = regex::bytes::Regex::new(&prefilter_regex)?;
 
     // There is no nice way to write this other than with chaining intersperse, so
     // allow unstable name collisions.
@@ -77,7 +78,7 @@ pub fn update(pacman_download: bool) -> eyre::Result<()> {
         .intersperse("|".into())
         .collect::<CompactString>();
     let filter = regex::Regex::new(&exact_regex)?;
-    let prefilter = |path: &str| prefilter.is_match(path);
+    let prefilter = |path: &[u8]| prefilter.is_match(path);
     let filter = |path: &str| filter.is_match(path);
 
     files
@@ -90,7 +91,7 @@ pub fn update(pacman_download: bool) -> eyre::Result<()> {
 #[tracing::instrument(skip(pre_filter, filter))]
 fn update_file(
     file: &Utf8Path,
-    pre_filter: &impl Fn(&str) -> bool,
+    pre_filter: &impl Fn(&[u8]) -> bool,
     filter: &impl Fn(&str) -> bool,
 ) -> eyre::Result<()> {
     tracing::info!("Processing {:?}", file);
@@ -146,7 +147,7 @@ fn find_files() -> eyre::Result<Vec<Utf8PathBuf>> {
 
 fn process_files_archive(
     path: &Utf8Path,
-    pre_filter: &impl Fn(&str) -> bool,
+    pre_filter: &impl Fn(&[u8]) -> bool,
     filter: &impl Fn(&str) -> bool,
 ) -> eyre::Result<DataRoot> {
     let mut interner = StringInternerBuilder::new();
@@ -172,7 +173,7 @@ struct RecordWorkInProgress {
 fn process_files_archive_inner(
     path: &Utf8Path,
     interner: &mut StringInternerBuilder,
-    pre_filter: &impl Fn(&str) -> bool,
+    pre_filter: &impl Fn(&[u8]) -> bool,
     filter: &impl Fn(&str) -> bool,
 ) -> eyre::Result<BinariesData> {
     let file = BufReader::new(File::open(path)?);
@@ -225,40 +226,37 @@ fn process_files_archive_inner(
                 // Extract file list
                 let mut contents = SmallVec::new();
                 let mut bufreader = BufReader::new(entry);
-                while bufreader.read_line(&mut str_buffer)? > 0 {
-                    'inner: {
-                        if str_buffer == "\n" {
-                            break 'inner;
-                        }
-                        if str_buffer == "%FILES%\n" {
-                            break 'inner;
-                        }
-                        // Do a first approximate filter, as parent() is slow
-                        if !pre_filter(&str_buffer) {
-                            break 'inner;
-                        }
-                        let path: &Utf8Path = Utf8Path::new(str_buffer.trim());
-                        let parent = path.parent();
-                        let Some(parent) = parent else {
-                            tracing::warn!("No parent for {:?}", path);
-                            break 'inner;
-                        };
-                        // Do an exact check to detect sub-directories
-                        if !filter(parent.as_str()) {
-                            break 'inner;
-                        }
-                        let file_name = path.file_name();
-                        let Some(file_name) = file_name else {
-                            tracing::warn!("No file name for {:?}", path);
-                            break 'inner;
-                        };
-                        contents.push((
-                            file_name.to_string(),
-                            DirectoryRef(interner.intern(parent.as_str())),
-                        ));
+                bufreader.for_byte_line(|line: &[u8]| {
+                    if line == b"" || line == b"%FILES%" {
+                        return Ok(true);
                     }
-                    str_buffer.clear();
-                }
+                    // Do a first approximate filter, as parent() is slow
+                    if !pre_filter(line) {
+                        return Ok(true);
+                    }
+                    let line = line.to_str().map_err(std::io::Error::other)?;
+
+                    let path: &Utf8Path = Utf8Path::new(line.trim());
+                    let parent = path.parent();
+                    let Some(parent) = parent else {
+                        tracing::warn!("No parent for {:?}", path);
+                        return Ok(true);
+                    };
+                    // Do an exact check to detect sub-directories
+                    if !filter(parent.as_str()) {
+                        return Ok(true);
+                    }
+                    let file_name = path.file_name();
+                    let Some(file_name) = file_name else {
+                        tracing::warn!("No file name for {:?}", path);
+                        return Ok(true);
+                    };
+                    contents.push((
+                        file_name.to_string(),
+                        DirectoryRef(interner.intern(parent.as_str())),
+                    ));
+                    Ok(true)
+                })?;
                 match package_map.entry(dir_name) {
                     Entry::Occupied(occupied_entry) => {
                         occupied_entry.into_mut().files = contents;
