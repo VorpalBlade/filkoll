@@ -44,59 +44,6 @@ impl StringInternerBuilder {
         Self::default()
     }
 
-    /// Create a new builder with a given capacity and expected average string
-    /// length
-    #[allow(dead_code)]
-    pub fn with_capacity(capacity: usize, avg_length: usize) -> Self {
-        Self {
-            data: Vec::with_capacity(capacity * (2 + avg_length)),
-            lookup: hashbrown::HashMap::with_capacity(capacity),
-        }
-    }
-
-    /// Number of items in builder
-    #[allow(dead_code)]
-    pub fn len(&self) -> usize {
-        self.lookup.len()
-    }
-
-    /// Get the string for a given handle
-    ///
-    /// Unlike `get()` this doesn't perform UTF-8 validation.
-    ///
-    /// # Safety
-    /// You must ensure the handle comes from the same instance of the arena.
-    #[allow(dead_code)]
-    pub unsafe fn get_unchecked(&self, handle: Handle) -> &str {
-        let data = self.get_raw(handle);
-
-        // SAFETY: Data is valid utf8
-        // * We only allow valid UTF-8 to be added.
-        // * Handles cannot be constructed from outside.
-        // * The user ensures it is from the same instance of the arena.
-        unsafe { std::str::from_utf8_unchecked(data) }
-    }
-
-    /// Get the string for a given handle
-    #[allow(dead_code)]
-    pub fn get(&self, handle: Handle) -> &str {
-        let data = self.get_raw(handle);
-
-        std::str::from_utf8(data).expect("Invalid utf8")
-    }
-
-    /// Get the raw bytes for a given handle
-    #[allow(dead_code)]
-    pub fn get_raw(&self, handle: Handle) -> &[u8] {
-        let offset = handle.offset as usize;
-        assert!(self.data.len() >= offset);
-
-        // Get the string size at offset (u16)
-        let size = u16::from_le_bytes([self.data[offset], self.data[offset + 1]]) as usize;
-        // Get the string at offset + 2
-        &self.data[(offset + 2)..(offset + 2 + size)]
-    }
-
     /// Intern a string and return a handle to it
     pub fn intern(&mut self, value: &str) -> Handle {
         if let Some(handle) = self.lookup.get(value) {
@@ -118,34 +65,9 @@ impl StringInternerBuilder {
     pub fn into_readonly(self) -> StringInterner {
         StringInterner { data: self.data }
     }
-
-    #[allow(dead_code)]
-    #[cfg(test)]
-    pub fn iter(&self) -> InternerIter<'_> {
-        InternerIter {
-            data: &self.data,
-            offset: 0,
-        }
-    }
 }
 
 impl ArchivedStringInterner {
-    /// Get the string for a given handle
-    ///
-    /// Unlike `get()` this doesn't perform UTF-8 validation.
-    ///
-    /// # Safety
-    /// You must ensure the handle comes from the same instance of the arena.
-    pub unsafe fn get_unchecked(&self, handle: ArchivedHandle) -> &str {
-        let data = self.get_raw(handle);
-
-        // SAFETY: Data is valid utf8
-        // * We only allow valid UTF-8 to be added.
-        // * Handles cannot be constructed from outside.
-        // * The user ensures it is from the same instance of the arena.
-        unsafe { std::str::from_utf8_unchecked(data) }
-    }
-
     /// Get the string for a given handle
     pub fn get(&self, handle: ArchivedHandle) -> &str {
         let data = self.get_raw(handle);
