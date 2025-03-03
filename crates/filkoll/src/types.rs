@@ -73,7 +73,7 @@ pub(crate) struct DataRoot {
 }
 
 /// A record of a file: which package and directory it belongs to
-#[derive(Debug, rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, TypeHash)]
+#[derive(Debug, Copy, Clone, rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, TypeHash)]
 pub(crate) struct Record {
     pub(crate) package: PackageRef,
     pub(crate) directory: DirectoryRef,

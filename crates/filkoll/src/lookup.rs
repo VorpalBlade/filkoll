@@ -113,9 +113,18 @@ fn search_in_file(
     //   matching version
     let data = unsafe { rkyv::api::access_unchecked::<ArchivedDataRoot>(payload) };
 
-    let exact_match = data.binaries.get(search_term);
+    search_data_root(search_term, max_edit_dist, data)
+}
 
+/// Search an archived data root.
+fn search_data_root(
+    search_term: &str,
+    max_edit_dist: u8,
+    data: &ArchivedDataRoot,
+) -> Result<Vec<Suggestion>, eyre::Error> {
     if max_edit_dist == 0 {
+        let exact_match = data.binaries.get(search_term);
+
         if let Some(exact_match) = exact_match {
             let result = exact_match
                 .iter()
@@ -146,5 +155,101 @@ fn search_in_file(
             }
         }
         Ok(suggestions)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::lookup::Suggestion;
+    use crate::types::ArchivedDataRoot;
+    use crate::types::DataRoot;
+    use crate::types::DirectoryRef;
+    use crate::types::PackageRef;
+    use smallvec::SmallVec;
+
+    #[test]
+    fn test_search() {
+        // Create string interner:
+        let mut builder = crate::interner::StringInternerBuilder::new();
+        let usrbin = DirectoryRef(builder.intern("/usr/bin"));
+        let coreutils = PackageRef(builder.intern("coreutils"));
+        let rust = PackageRef(builder.intern("rust"));
+        let sl = PackageRef(builder.intern("sl"));
+        let mut binaries = crate::types::BinariesData::new();
+        binaries.insert(
+            "ls".into(),
+            SmallVec::from_slice(&[crate::types::Record {
+                package: coreutils,
+                directory: usrbin,
+            }]),
+        );
+        binaries.insert(
+            "sl".into(),
+            SmallVec::from_slice(&[crate::types::Record {
+                package: sl,
+                directory: usrbin,
+            }]),
+        );
+        binaries.insert(
+            "cat".into(),
+            SmallVec::from_slice(&[crate::types::Record {
+                package: coreutils,
+                directory: usrbin,
+            }]),
+        );
+        binaries.insert(
+            "cargo".into(),
+            SmallVec::from_slice(&[crate::types::Record {
+                package: rust,
+                directory: usrbin,
+            }]),
+        );
+        let data = DataRoot {
+            repository: "core".into(),
+            interner: builder.into_readonly(),
+            binaries,
+        };
+        // Serialise and deserialise data to get the archived form
+        let serialised = rkyv::api::high::to_bytes::<rkyv::rancor::Error>(&data).unwrap();
+        let archived =
+            rkyv::api::high::access::<ArchivedDataRoot, rkyv::rancor::Error>(&serialised).unwrap();
+
+        // Test exact match
+        let results = super::search_data_root("ls", 0, archived).unwrap();
+        assert_eq!(results.len(), 1);
+        assert_eq!(
+            results[0],
+            Suggestion {
+                distance: 0,
+                repo: "core".into(),
+                package: "coreutils".into(),
+                directory: "/usr/bin".into(),
+                command: "ls".into()
+            }
+        );
+
+        // Test fuzzy match
+        let mut results = super::search_data_root("ls", 2, archived).unwrap();
+        assert_eq!(results.len(), 2);
+        results.sort();
+        assert_eq!(
+            results,
+            vec![
+                Suggestion {
+                    distance: 0,
+                    repo: "core".into(),
+                    package: "coreutils".into(),
+                    directory: "/usr/bin".into(),
+                    command: "ls".into()
+                },
+                Suggestion {
+                    distance: 2,
+                    repo: "core".into(),
+                    package: "sl".into(),
+                    directory: "/usr/bin".into(),
+                    command: "sl".into()
+                }
+            ]
+        );
     }
 }
