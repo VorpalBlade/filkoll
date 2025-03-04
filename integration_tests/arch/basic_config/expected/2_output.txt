@@ -1,0 +1,69 @@
++ filkoll binary -e 0 bash
+core/bash 5.2.037-1        /usr/bin/bash    (exact match)
++ filkoll binary -e 2 bash
+core/bash 5.2.037-1                       /usr/bin/bash    (exact match)
+core/bash 5.2.037-1                       /usr/bin/rbash
+core/dash 0.5.12-1                        /usr/bin/dash
+extra/avahi 1:0.8+r194+g3f79789-3         /usr/bin/bssh
+extra/bass 1.2-14                         /usr/bin/bass
+extra/reaver 1.6.6-1                      /usr/bin/wash
+core/bash 5.2.037-1                       /usr/bin/sh
+core/binutils 2.44-1                      /usr/bin/as
+core/inetutils 2.5-1                      /usr/bin/rsh
+core/libcap 2.71-1                        /usr/bin/capsh
+core/openssh 9.9p2-1                      /usr/bin/ssh
+core/sqlite 3.49.1-1                      /usr/bin/dbhash
+core/util-linux 2.40.4-1                  /usr/bin/chsh
+core/util-linux 2.40.4-1                  /usr/bin/last
+extra/acpica                   /usr/bin/iasl
+extra/amule 1:2.3.3-10                    /usr/bin/cas
+extra/anything-sync-daemon 6.0.0-3        /usr/bin/asd
+extra/asymptote 3.01-1                    /usr/bin/asy
+extra/asymptote 3.01-1                    /usr/bin/xasy
+extra/at 3.2.5-4                          /usr/bin/batch
+extra/babl 0.1.110-1                      /usr/bin/babl
+extra/balsa 2.6.4-4                       /usr/bin/balsa
+extra/bam 0.5.1-3                         /usr/bin/bam
+extra/bat 0.25.0-4                        /usr/bin/bat
+extra/bats 1.11.1-1                       /usr/bin/bats
+extra/bfs 4.0.6-1                         /usr/bin/bfs
+extra/bugstalker 0.2.7-1                  /usr/bin/bs
+extra/caph 1.1-8                          /usr/bin/caph
+extra/clash 1.18.0-1                      /usr/bin/clash
+extra/clash-ghc 1.8.1-39                  /usr/bin/clash
+extra/crash 8.0.6-1                       /usr/bin/crash
+extra/dart-sass 1.83.4-1                  /usr/bin/sass
+extra/esh 0.3.2-2                         /usr/bin/esh
+extra/fasd 1.0.2-2                        /usr/bin/fasd
+extra/fasm 1.73.32-1                      /usr/bin/fasm
+extra/fish 4.0.0-2                        /usr/bin/fish
+extra/gauche 0.9.15-1                     /usr/bin/gosh
+extra/haskell-pretty-show 1.10-16         /usr/bin/ppsh
+extra/ksh 2020.0.0-3                      /usr/bin/ksh
+extra/libnbd 1.22.0-1                     /usr/bin/nbdsh
+extra/linux-atm 2.5.2-9                   /usr/bin/bus
+extra/mosh 1.4.0-18                       /usr/bin/mosh
+extra/nasm 2.16.03-1                      /usr/bin/nasm
+extra/oil 0.26.0-1                        /usr/bin/osh
+extra/oil 0.26.0-1                        /usr/bin/ysh
+extra/pass 1.7.4-7                        /usr/bin/pass
+extra/python-dask 2025.2.0-1              /usr/bin/dask
+extra/rhash 1.4.4-1                       /usr/bin/rhash
+extra/ruby-bake 0.18.2-6                  /usr/bin/bake
+extra/ruby-sass 3.7.4-5                   /usr/bin/sass
+extra/slang 2.3.3-3                       /usr/bin/slsh
+extra/task 3.3.0-1                        /usr/bin/task
+extra/tcsh 6.24.15-1                      /usr/bin/csh
+extra/tcsh 6.24.15-1                      /usr/bin/tcsh
+extra/tk 8.6.16-1                         /usr/bin/wish
+extra/tlsh 4.12.0-1                       /usr/bin/tlsh
+extra/trash-cli 0.24.5.26-2               /usr/bin/trash
+extra/uasm 2.57-2                         /usr/bin/uasm
+extra/vcsh 2.0.10-1                       /usr/bin/vcsh
+extra/yasm 1.3.0-7                        /usr/bin/yasm
+extra/yass 0.1.0-3                        /usr/bin/yass
+extra/zsh 5.9-5                           /usr/bin/zsh
+extra/zssh 1.5c-14                        /usr/bin/zssh
++ filkoll binary -ne 1 zsh
+extra/zsh 5.9-5        /usr/bin/zsh    (exact match)
++ filkoll binary -e 2 no_such_binary_exists

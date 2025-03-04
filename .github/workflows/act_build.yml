@@ -31,9 +31,7 @@ jobs:
         target:
           - aarch64-unknown-linux-gnu
           - aarch64-unknown-linux-musl
-          - armv7-unknown-linux-gnueabihf
           - armv7-unknown-linux-musleabihf
-          - i686-unknown-linux-gnu
           - i686-unknown-linux-musl
           - x86_64-unknown-linux-gnu
           - x86_64-unknown-linux-musl
@@ -70,24 +68,25 @@ jobs:
           ld -v
       - name: Install cross
         uses: taiki-e/install-action@cross
-      - name: Cache builds
-        uses: Swatinem/rust-cache@v2.7.7
-        with:
-          key: ${{ matrix.target }}-${{ matrix.rust }}
+      # TODO: Cache is broken for cross compiles, figure this out
+      #- name: Cache builds
+      #  uses: Swatinem/rust-cache@v2.7.7
+      #  with:
+      #    key: ${{ matrix.target }}-${{ matrix.rust }}
       - name: Cross compile binary
-        run: cross build --locked --target ${{ matrix.target }} --verbose
+        run: cross build --release --locked --target ${{ matrix.target }} --verbose
       - name: Cross compile tests
-        run: cross test --no-run --locked --target ${{ matrix.target }} --verbose
+        run: cross test --release --no-run --locked --target ${{ matrix.target }} --verbose
       - name: Cross test
-        run: cross test --locked --target ${{ matrix.target }} --verbose
+        run: cross test --release --locked --target ${{ matrix.target }} --verbose
       - name: Compress binary
         if: matrix.rust == 'stable' && contains(matrix.target, 'musl')
         run: |
           mkdir filkoll
-          cp target/${{ matrix.target }}/debug/filkoll filkoll/
-          if [[ -f target/${{ matrix.target }}/debug/filkoll.dwp ]]; then
-            # No split debug info for RISCV
-            cp target/${{ matrix.target }}/debug/filkoll.dwp filkoll/
+          cp target/${{ matrix.target }}/release/filkoll filkoll/
+          if [[ -f target/${{ matrix.target }}/release/filkoll.dwp ]]; then
+            # No split release info for RISCV
+            cp target/${{ matrix.target }}/release/filkoll.dwp filkoll/
           fi
           tar cf filkoll.tar filkoll
           zstd -T0 -6 filkoll.tar
@@ -138,29 +137,50 @@ jobs:
     env:
       # Warnings are ok for now here due to private APIs that will be public in the future.
       RUSTFLAGS: ""
-      # TODO: Implement integration tests
-      #integration:
-      #  name: "Integration tests"
-      #  runs-on: ubuntu-24.04
-      #  needs: modern-default
-      #  steps:
-      #    - uses: actions/checkout@v4
-      #      with:
-      #        persist-credentials: false
-      #    - uses: actions/download-artifact@v4
-      #      with:
-      #        name: filkoll_x86_64-unknown-linux-musl.tar.zst
-      #    - name: Unpack binaries
-      #      run: |
-      #        tar xf ${GITHUB_WORKSPACE}/filkoll.tar.zst
-      #        mkdir -p target/debug
-      #        mv filkoll/* target/debug/
-      #    - name: Install podman
-      #      run: |
-      #        sudo apt-get update
-      #        sudo apt-get install -y podman
-      #        podman --version
-      #    - name: Run integration tests
-      #      run: |-
-      #        cd integration_tests
-      #        ./run_tests.sh
+
+  integration:
+    name: "Integration tests"
+    runs-on: ubuntu-24.04
+    needs: modern-default
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: filkoll_x86_64-unknown-linux-musl.tar.zst
+      - name: Unpack binaries
+        run: |
+          tar xf ${GITHUB_WORKSPACE}/filkoll.tar.zst
+          mkdir -p target/release
+          mv filkoll/* target/release/
+      - name: Install podman
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y podman
+          podman --version
+      - name: Cache podman image
+        id: cache-podman
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/podman_cache
+          key: integration_tests-${{ runner.os }}-${{ hashFiles('integration_tests/images/arch/Containerfile') }}
+      - name: Load cached image
+        if: steps.cache-podman.outputs.cache-hit == 'true'
+        run: |-
+          set +ex
+          podman load < ~/podman_cache/filkoll_test_img.tar
+      - name: Build & cache image
+        if: steps.cache-podman.outputs.cache-hit != 'true'
+        run: |-
+          set +ex
+          cd integration_tests/images/arch
+          ./build_image.sh
+          mkdir -p ~/podman_cache
+          podman save localhost/filkoll_test_img > ~/podman_cache/filkoll_test_img.tar
+      - name: Run integration tests
+        run: |-
+          cd integration_tests
+          ./run_tests.sh
+    
