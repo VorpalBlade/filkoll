@@ -81,6 +81,9 @@ pub fn update(pacman_download: bool) -> eyre::Result<()> {
     let prefilter = |path: &[u8]| prefilter.is_match(path);
     let filter = |path: &str| filter.is_match(path);
 
+    // Ensure our cache path exists
+    std::fs::create_dir_all(crate::CACHE_PATH)?;
+
     files
         .par_iter()
         .try_for_each(|file| update_file(file, &prefilter, &filter))?;
