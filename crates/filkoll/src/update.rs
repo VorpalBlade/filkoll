@@ -99,7 +99,7 @@ fn update_file(
 ) -> eyre::Result<()> {
     tracing::info!("Processing {:?}", file);
     let data_root = process_files_archive(file, pre_filter, filter)?;
-    tracing::info!("Processed {:?}", file);
+    tracing::debug!("Processed {:?}", file);
     let cache_path = Utf8PathBuf::from_str(crate::CACHE_PATH)?;
     let cache_path = cache_path.join(
         file.file_stem()
@@ -115,7 +115,7 @@ fn update_file(
     writer.write_all(header.as_bytes())?;
 
     // Write data
-    tracing::info!("Writing {:?}", &tmp_path);
+    tracing::debug!("Writing {:?}", &tmp_path);
     let writer = rkyv::ser::writer::IoWriter::new(&mut writer);
     rkyv::api::high::to_bytes_in::<_, rkyv::rancor::Error>(&data_root, writer)?;
     tracing::info!("Wrote {:?}", &tmp_path);
