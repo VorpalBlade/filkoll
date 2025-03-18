@@ -8,6 +8,24 @@ edited).
 For a possibly more edited message focused on the binary please see the github
 releases.
 
+## [0.2.2] - 2025-03-18
+
+### 🐛 Bug fixes
+
+- Create cache directory if missing
+
+### 🩺 Diagnostics & output formatting
+
+- Reduce amount of debug output from update command
+
+### 🧪 Testing
+
+- Add more unit tests
+
+### ⚙️ Other stuff
+
+- Add missing invariant
+
 ## [0.2.1] - 2025-02-28
 
 ### ⚡ Performance improvements
