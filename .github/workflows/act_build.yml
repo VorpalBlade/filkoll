@@ -70,7 +70,7 @@ jobs:
         uses: taiki-e/install-action@cross
       # TODO: Cache is broken for cross compiles, figure this out
       #- name: Cache builds
-      #  uses: Swatinem/rust-cache@v2.7.7
+      #  uses: Swatinem/rust-cache@v2.7.8
       #  with:
       #    key: ${{ matrix.target }}-${{ matrix.rust }}
       - name: Cross compile binary
@@ -129,7 +129,7 @@ jobs:
         run: |
           curl -L https://github.com/cargo-bins/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-musl.tgz | tar -zxf - && mv cargo-binstall $HOME/.cargo/bin/
       - name: Cache builds
-        uses: Swatinem/rust-cache@v2.7.7
+        uses: Swatinem/rust-cache@v2.7.8
       - name: Compile
         run: cargo test --locked ${{ matrix.features }} --verbose --no-run
       - name: Test
