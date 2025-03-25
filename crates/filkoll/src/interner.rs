@@ -78,7 +78,7 @@ impl ArchivedStringInterner {
     /// Get the raw bytes for a given handle
     pub fn get_raw(&self, handle: ArchivedHandle) -> &[u8] {
         let offset = handle.offset.to_native() as usize;
-        assert!(self.data.len() >= offset);
+        debug_assert!(self.data.len() >= (offset + 2));
 
         // Get the string size at offset (u16)
         let size = u16::from_le_bytes([self.data[offset], self.data[offset + 1]]) as usize;

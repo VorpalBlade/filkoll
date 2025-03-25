@@ -119,7 +119,7 @@ fn update_file(
     let writer = rkyv::ser::writer::IoWriter::new(&mut writer);
     rkyv::api::high::to_bytes_in::<_, rkyv::rancor::Error>(&data_root, writer)?;
     tracing::info!("Wrote {:?}", &tmp_path);
-    // INVARIANT: Rename in place of old file.
+    // INVARIANT: Rename to atomically update the file
     // This is a safety requirement to allow mmaping the file during lookup.
     std::fs::rename(&tmp_path, &cache_path)?;
     Ok(())
