@@ -21,6 +21,8 @@ use rayon::iter::ParallelIterator;
 use smallvec::SmallVec;
 use std::fs::File;
 use std::io::BufReader;
+use std::io::Read;
+use std::io::Seek;
 use std::io::Write;
 use std::str::FromStr;
 use zerocopy::IntoBytes;
@@ -179,14 +181,33 @@ fn process_files_archive_inner(
     pre_filter: &impl Fn(&[u8]) -> bool,
     filter: &impl Fn(&str) -> bool,
 ) -> eyre::Result<BinariesData> {
-    let file = BufReader::new(File::open(path)?);
-    let decoder = GzDecoder::new(file);
-    if decoder.header().is_none() {
-        eyre::bail!(
-            "Failed to open {:?} as gzip compressed (did Arch Linux change formats?)",
-            path
-        );
-    }
+    let mut file = BufReader::new(File::open(path)?);
+    // Read the first 4 bytes to determine file type:
+    let mut magic = [0; 4];
+    file.read_exact(&mut magic)?;
+    file.rewind()?;
+    let decoder: Box<dyn Read> = match magic {
+        [0x1F, 0x8B, _, _] => {
+            // Gzip compressed
+            let decoder = GzDecoder::new(file);
+            if decoder.header().is_none() {
+                eyre::bail!("Failed to open {path:?} as gzip compressed (file might be corrupt?)");
+            }
+            Box::new(decoder)
+        }
+        [0x28, 0xb5, 0x2f, 0xfd] => {
+            // Zstd compressed
+            Box::new(zstd::stream::read::Decoder::new(file).with_context(|| {
+                format!("Failed to open {path:?} as zstd compressed (file might be corrupt?)")
+            })?)
+        }
+        _ => {
+            eyre::bail!(
+                "Failed to open {path:?}: unknown file type (magic: {magic:02x?}), not zstd or \
+                 gzip"
+            );
+        }
+    };
 
     let mut archive = tar::Archive::new(decoder);
 
