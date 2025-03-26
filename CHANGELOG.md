@@ -8,6 +8,12 @@ edited).
 For a possibly more edited message focused on the binary please see the github
 releases.
 
+## [0.2.3] - 2025-03-26
+
+### 🚀 Features
+
+- Add support for zstd
+
 ## [0.2.2] - 2025-03-25
 
 ### 🐛 Bug fixes
