@@ -183,28 +183,32 @@ fn process_files_archive_inner(
 ) -> eyre::Result<BinariesData> {
     let mut file = BufReader::new(File::open(path)?);
     // Read the first 4 bytes to determine file type:
-    let mut magic = [0; 4];
+    let mut magic = [0; 6];
     file.read_exact(&mut magic)?;
     file.rewind()?;
     let decoder: Box<dyn Read> = match magic {
-        [0x1F, 0x8B, _, _] => {
+        [0x1F, 0x8B, _, _, _, _] => {
             // Gzip compressed
-            let decoder = GzDecoder::new(file);
+            let decoder = Box::new(GzDecoder::new(file));
             if decoder.header().is_none() {
                 eyre::bail!("Failed to open {path:?} as gzip compressed (file might be corrupt?)");
             }
-            Box::new(decoder)
+            decoder
         }
-        [0x28, 0xb5, 0x2f, 0xfd] => {
+        [0x28, 0xb5, 0x2f, 0xfd, _, _] => {
             // Zstd compressed
             Box::new(zstd::stream::read::Decoder::new(file).with_context(|| {
                 format!("Failed to open {path:?} as zstd compressed (file might be corrupt?)")
             })?)
         }
+        [0xfd, 0x37, 0x7a, 0x58, 0x5a, 0x00] => {
+            // XZ compressed
+            Box::new(xz2::bufread::XzDecoder::new(file))
+        }
         _ => {
             eyre::bail!(
-                "Failed to open {path:?}: unknown file type (magic: {magic:02x?}), not zstd or \
-                 gzip"
+                "Failed to open {path:?}: unknown file type (magic: {magic:02x?}), not zstd, gzip \
+                 or xz2"
             );
         }
     };
