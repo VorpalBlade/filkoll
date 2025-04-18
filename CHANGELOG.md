@@ -8,6 +8,12 @@ edited).
 For a possibly more edited message focused on the binary please see the github
 releases.
 
+## [0.2.4] - 2025-04-18
+
+### 🚀 Features
+
+- Support for xz2 compression
+
 ## [0.2.3] - 2025-03-26
 
 ### 🚀 Features
