@@ -1,5 +1,4 @@
 [workspace]
-git_release_enable = false
 git_release_body = """
 > [!IMPORTANT]  
 > There are no standalone binary releases as support files must be installed.
@@ -13,9 +12,11 @@ git_release_body = """
 {% endfor %}
 {% endif %}
 """
+git_release_enable = false
 
 [[package]]
 name = "xtask"
+publish = false
 release = false
 
 # We only want GH releases for the binaries
@@ -23,8 +24,8 @@ release = false
 changelog_path = "CHANGELOG.md"
 git_release_enable = true
 git_release_type = "auto"
-name = "filkoll"
 git_tag_name = "v{{ version }}"
+name = "filkoll"
 
 [changelog]
 body = """
