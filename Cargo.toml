@@ -8,17 +8,17 @@ anstyle = "1.0.10"
 bstr = "1.12.0"
 camino = "1.1.9"
 clap = { version = "4.5.37", features = ["derive"] }
-clap_complete = "4.5.47"
+clap_complete = "4.5.50"
 clap_mangen = "0.2.26"
-color-eyre = "0.6.3"
+color-eyre = "0.6.4"
 compact_str = { version = "0.9.0", features = ["smallvec"] }
 eyre = "0.6.12"
 flate2 = { version = "1.1.1", default-features = false, features = ["zlib-rs"] }
-hashbrown = "0.15.2"
+hashbrown = "0.15.3"
 indoc = "2.0.6"
 itertools = "0.14.0"
 memmap2 = "0.9.5"
-mimalloc = "=0.1.44"
+mimalloc = "0.1.46"
 pretty_assertions = "1.4.1"
 rayon = "1.10.0"
 regex = { version = "1.11.1", default-features = false, features = [
@@ -43,7 +43,7 @@ tracing-error = "0.2.1"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 type_hash = "0.3.0"
 xz2 = { version = "0.1.7", features = ["static"] }
-zerocopy = { version = "0.8.24", features = ["derive"] }
+zerocopy = { version = "0.8.25", features = ["derive"] }
 zstd = "0.13.3"
 
 [workspace.lints.rust]
