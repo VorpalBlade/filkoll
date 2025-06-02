@@ -8,6 +8,12 @@ edited).
 For a possibly more edited message focused on the binary please see the github
 releases.
 
+## [0.2.6] - 2025-06-02
+
+### 🩺 Diagnostics & output formatting
+
+- Improve error report on cache file version mismatch
+
 ## [0.2.5] - 2025-05-17
 
 ### ⚙️ Other stuff
