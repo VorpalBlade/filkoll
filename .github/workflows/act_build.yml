@@ -69,7 +69,7 @@ jobs:
       - name: Install cross
         uses: taiki-e/install-action@735e5933943122c5ac182670a935f54a949265c1 # v2.52.4
         with:
-          tool: cross@0.2.5
+          tool: cross@latest
       # TODO: Cache is broken for cross compiles, figure this out
       #- name: Cache builds
       #  uses: Swatinem/rust-cache@v2.7.8
