@@ -5,6 +5,7 @@ use crate::types::Header;
 use camino::Utf8Path;
 use camino::Utf8PathBuf;
 use compact_str::CompactString;
+use eyre::Context;
 use memmap2::Mmap;
 use std::fs::File;
 use zerocopy::FromBytes;
@@ -39,18 +40,49 @@ impl Suggestion {
 /// Suggestions for search results
 pub type Suggestions = Vec<Suggestion>;
 
+/// Error type for lookup operations
+#[derive(Debug, thiserror::Error)]
+pub enum LookupError {
+    #[error("No cache files found (likely due to a new installation)")]
+    MissingCacheFiles,
+    #[error("Invalid header in cache file (likely from a different version of filkoll)")]
+    InvalidHeader,
+    #[error("{0}")]
+    Other(#[from] eyre::Error),
+}
+
+impl LookupError {
+    pub fn suggestion(&self) -> Option<String> {
+        match self {
+            Self::MissingCacheFiles => Some(format!(
+                "Run {}sudo filkoll update{} to create cache files, and if this is a new install \
+                 also `sudo systemctl enable filkoll.timer`",
+                anstyle::Color::Ansi(anstyle::AnsiColor::Blue)
+                    .on_default()
+                    .render(),
+                anstyle::Reset.render()
+            )),
+            Self::InvalidHeader => Some(format!(
+                "Run {}sudo filkoll update{} to refresh the cache files.",
+                anstyle::Color::Ansi(anstyle::AnsiColor::Blue)
+                    .on_default()
+                    .render(),
+                anstyle::Reset.render()
+            )),
+            Self::Other(_) => None,
+        }
+    }
+}
+
 pub fn lookup(
     edit_distance: u8,
     no_fuzzy_if_exact: bool,
     search_term: &str,
-) -> eyre::Result<Suggestions> {
+) -> Result<Suggestions, LookupError> {
     let files = find_files()?;
 
     if files.is_empty() {
-        return Err(eyre::eyre!(
-            "No cache files found (if this is a new install: sudo filkoll update && sudo \
-             systemctl enable filkoll.timer)"
-        ));
+        return Err(LookupError::MissingCacheFiles);
     }
 
     let results = files
@@ -85,15 +117,19 @@ fn find_files() -> eyre::Result<Vec<Utf8PathBuf>> {
 }
 
 fn search_in_file(
-    file: &Utf8Path,
+    file_name: &Utf8Path,
     search_term: &str,
     max_edit_dist: u8,
-) -> eyre::Result<Suggestions> {
-    let file = File::options().read(true).open(file)?;
+) -> Result<Suggestions, LookupError> {
+    let file = File::options()
+        .read(true)
+        .open(file_name)
+        .with_context(|| format!("Failed to open {file_name} for reading"))?;
     // SAFETY:
     // * When the file is written it is created anew, not overwritten in place. As
     //   such it cannot change under us.
-    let mmap = unsafe { Mmap::map(&file) }?;
+    let mmap = unsafe { Mmap::map(&file) }
+        .with_context(|| format!("Failed to memory map data file {file_name}"))?;
 
     // Read the header at the start of the file
     // Note: The error contains lifetimes to the buffer, so we need to eagerly
@@ -102,9 +138,7 @@ fn search_in_file(
         Header::ref_from_prefix(&mmap).map_err(|e| eyre::eyre!("Failed to load header: {e}"))?;
 
     if !header.is_valid() {
-        return Err(eyre::eyre!(
-            "Invalid header in cache file (try sudo filkoll update)"
-        ));
+        return Err(LookupError::InvalidHeader);
     }
 
     // Load archive from payload
@@ -113,7 +147,7 @@ fn search_in_file(
     //   matching version
     let data = unsafe { rkyv::api::access_unchecked::<ArchivedDataRoot>(payload) };
 
-    search_data_root(search_term, max_edit_dist, data)
+    Ok(search_data_root(search_term, max_edit_dist, data))
 }
 
 /// Search an archived data root.
@@ -121,7 +155,7 @@ fn search_data_root(
     search_term: &str,
     max_edit_dist: u8,
     data: &ArchivedDataRoot,
-) -> Result<Vec<Suggestion>, eyre::Error> {
+) -> Vec<Suggestion> {
     if max_edit_dist == 0 {
         let exact_match = data.binaries.get(search_term);
 
@@ -132,9 +166,9 @@ fn search_data_root(
                     Suggestion::from_record(value, search_term, &data.interner, &data.repository, 0)
                 })
                 .collect();
-            return Ok(result);
+            return result;
         }
-        Ok(vec![])
+        vec![]
     } else {
         let mut suggestions = Suggestions::new();
         if max_edit_dist > 0 {
@@ -154,7 +188,7 @@ fn search_data_root(
                 }
             }
         }
-        Ok(suggestions)
+        suggestions
     }
 }
 
@@ -215,7 +249,7 @@ mod tests {
             rkyv::api::high::access::<ArchivedDataRoot, rkyv::rancor::Error>(&serialised).unwrap();
 
         // Test exact match
-        let results = super::search_data_root("ls", 0, archived).unwrap();
+        let results = super::search_data_root("ls", 0, archived);
         assert_eq!(results.len(), 1);
         assert_eq!(
             results[0],
@@ -229,7 +263,7 @@ mod tests {
         );
 
         // Test fuzzy match
-        let mut results = super::search_data_root("ls", 2, archived).unwrap();
+        let mut results = super::search_data_root("ls", 2, archived);
         assert_eq!(results.len(), 2);
         results.sort();
         assert_eq!(

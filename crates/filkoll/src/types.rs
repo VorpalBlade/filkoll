@@ -18,7 +18,7 @@ pub(crate) struct Header {
     pub(crate) type_hash: u64,
 }
 
-const DATA_VERSION: u32 = 1;
+const DATA_VERSION: u32 = 2;
 
 impl Default for Header {
     fn default() -> Self {

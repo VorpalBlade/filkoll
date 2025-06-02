@@ -2,8 +2,10 @@ use anstyle::Effects;
 use anstyle::Reset;
 use clap::Parser;
 use filkoll::cli::Cli;
+use filkoll::lookup::LookupError;
 use std::fmt::Write as _;
 use std::io::Write as _;
+use std::process::ExitCode;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 
@@ -14,7 +16,7 @@ mod _musl {
     static GLOBAL: MiMalloc = MiMalloc;
 }
 
-fn main() -> eyre::Result<()> {
+fn main() -> eyre::Result<ExitCode> {
     color_eyre::install()?;
     // Set up logging with tracing
     let filter = tracing_subscriber::EnvFilter::builder()
@@ -34,16 +36,56 @@ fn main() -> eyre::Result<()> {
         filkoll::cli::Commands::Binary {
             edit_distance,
             search_term,
+            cmd_not_found_handler,
             no_fuzzy_if_exact,
         } => {
-            let mut candidates =
-                filkoll::lookup::lookup(edit_distance, no_fuzzy_if_exact, &search_term)?;
+            let candidates =
+                filkoll::lookup::lookup(edit_distance, no_fuzzy_if_exact, &search_term);
+            let mut candidates = match candidates {
+                Ok(candidates) => candidates,
+                Err(LookupError::Other(e)) => {
+                    return Err(e);
+                }
+                Err(err) => {
+                    let mut stderr = anstream::stderr().lock();
+                    writeln!(
+                        stderr,
+                        "{}Error{}: {err}",
+                        Effects::BOLD.render(),
+                        Reset.render()
+                    )?;
+                    let suggestion = err
+                        .suggestion()
+                        .unwrap_or_else(|| "No suggestion available.".to_string());
+                    writeln!(
+                        stderr,
+                        "\n{}Suggestion for fix{}:\n{suggestion}",
+                        Effects::BOLD.render(),
+                        Reset.render(),
+                    )?;
+                    return Ok(ExitCode::from(1u8));
+                }
+            };
+            if cmd_not_found_handler && candidates.is_empty() {
+                // If we are in command-not-found handler mode and there are no candidates,
+                // we should exit with code 2 to signal this to the shell script function.
+                //
+                // This is used to tell apart the case where we failed with an error (1).
+                return Ok(ExitCode::from(2u8));
+            }
             candidates.sort();
             let mut stdout = anstream::stdout().lock();
             let mut maxwidth1 = 0;
             for candidate in &candidates {
                 maxwidth1 = maxwidth1.max(candidate.repo.len() + candidate.package.len() + 1);
             }
+            if cmd_not_found_handler {
+                writeln!(
+                    stdout,
+                    "{search_term} may be found in the following packages:"
+                )?;
+            }
+            let indent = if cmd_not_found_handler { "  " } else { "" };
             let mut buf1 = String::new();
             for candidate in &candidates {
                 buf1.clear();
@@ -51,7 +93,7 @@ fn main() -> eyre::Result<()> {
                 if candidate.command == search_term {
                     writeln!(
                         stdout,
-                        "{}{buf1: <maxwidth1$}        /{}/{}{}    (exact match)",
+                        "{indent}{}{buf1: <maxwidth1$}        /{}/{}{}    (exact match)",
                         Effects::BOLD.render(),
                         candidate.directory,
                         candidate.command,
@@ -60,7 +102,7 @@ fn main() -> eyre::Result<()> {
                 } else {
                     writeln!(
                         stdout,
-                        "{buf1: <maxwidth1$}        /{}/{}",
+                        "{indent}{buf1: <maxwidth1$}        /{}/{}",
                         candidate.directory, candidate.command
                     )?;
                 }
@@ -68,5 +110,5 @@ fn main() -> eyre::Result<()> {
         }
     }
 
-    Ok(())
+    Ok(ExitCode::SUCCESS)
 }

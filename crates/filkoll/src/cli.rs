@@ -27,6 +27,9 @@ pub enum Commands {
         /// Skip fuzzy search if there is an exact match
         #[arg(short, long)]
         no_fuzzy_if_exact: bool,
+        /// Enable semantics suitable for command-not-found handler usage
+        #[arg(long, hide = true)]
+        cmd_not_found_handler: bool,
         /// File name to search for in PATH (PATH from the update command is
         /// used)
         #[arg()]
