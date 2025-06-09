@@ -31,7 +31,7 @@ rkyv = { version = "0.8.10", features = [
     "smallvec-1",
 ] }
 rust-ini = "0.21.1"
-smallvec = { version = "1.15.0", features = [
+smallvec = { version = "1.15.1", features = [
     "const_generics",
     "const_new",
     "union",
