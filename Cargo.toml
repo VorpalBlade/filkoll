@@ -4,7 +4,7 @@ resolver = "2"
 
 [workspace.dependencies]
 anstream = "0.6.18"
-anstyle = "1.0.10"
+anstyle = "1.0.11"
 bstr = "1.12.0"
 camino = "1.1.9"
 clap = { version = "4.5.39", features = ["derive"] }
