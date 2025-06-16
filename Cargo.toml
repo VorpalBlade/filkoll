@@ -3,7 +3,7 @@ members = ["crates/*"]
 resolver = "2"
 
 [workspace.dependencies]
-anstream = "0.6.18"
+anstream = "0.6.19"
 anstyle = "1.0.11"
 bstr = "1.12.0"
 camino = "1.1.9"
