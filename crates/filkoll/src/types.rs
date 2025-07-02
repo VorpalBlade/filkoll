@@ -23,7 +23,7 @@ const DATA_VERSION: u32 = 2;
 impl Default for Header {
     fn default() -> Self {
         const {
-            assert!(size_of::<Self>() % 16 == 0);
+            assert!(size_of::<Self>().is_multiple_of(16));
         }
 
         Self {

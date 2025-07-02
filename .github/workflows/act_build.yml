@@ -112,15 +112,9 @@ jobs:
         features:
           - --all-features
         rust:
-          - 1.85.0
+          - 1.88.0
           - stable
-        include:
-          # MSRV with default features too
-          - features:
-            rust: 1.85.0
-          # Nightly will all features
-          - features: --all-features
-            rust: nightly
+          - nightly
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
