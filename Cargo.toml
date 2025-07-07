@@ -30,7 +30,7 @@ rkyv = { version = "0.8.10", features = [
     "hashbrown-0_15",
     "smallvec-1",
 ] }
-rust-ini = "0.21.1"
+rust-ini = "0.21.2"
 smallvec = { version = "1.15.1", features = [
     "const_generics",
     "const_new",
