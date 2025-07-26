@@ -80,10 +80,20 @@ fn main() -> eyre::Result<ExitCode> {
                 maxwidth1 = maxwidth1.max(candidate.repo.len() + candidate.package.len() + 1);
             }
             if cmd_not_found_handler {
-                writeln!(
-                    stdout,
-                    "{search_term} may be found in the following packages:"
-                )?;
+                // Since the vec is sorted, and we have at least one candidate, this will be
+                // true:
+                let first = candidates.first().expect("candidates is not empty");
+                if first.distance == 0 {
+                    writeln!(
+                        stdout,
+                        "{search_term} may be found in the following packages:"
+                    )?;
+                } else {
+                    writeln!(
+                        stdout,
+                        "{search_term} not found, but the following are similar:"
+                    )?;
+                }
             }
             let indent = if cmd_not_found_handler { "  " } else { "" };
             let mut buf1 = String::new();
