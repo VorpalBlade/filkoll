@@ -7,8 +7,8 @@ anstream = "0.6.20"
 anstyle = "1.0.11"
 bstr = "1.12.0"
 camino = "1.1.11"
-clap = { version = "4.5.43", features = ["derive"] }
-clap_complete = "4.5.56"
+clap = { version = "4.5.44", features = ["derive"] }
+clap_complete = "4.5.57"
 clap_mangen = "0.2.29"
 color-eyre = "0.6.5"
 compact_str = { version = "0.9.0", features = ["smallvec"] }
@@ -38,7 +38,7 @@ smallvec = { version = "1.15.1", features = [
 ] }
 strsim = "0.11.1"
 tar = "0.4.44"
-thiserror = "2.0.12"
+thiserror = "2.0.14"
 tracing = "0.1.41"
 tracing-error = "0.2.1"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
