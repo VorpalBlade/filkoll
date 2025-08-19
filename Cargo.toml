@@ -7,7 +7,7 @@ anstream = "0.6.20"
 anstyle = "1.0.11"
 bstr = "1.12.0"
 camino = "1.1.11"
-clap = { version = "4.5.44", features = ["derive"] }
+clap = { version = "4.5.45", features = ["derive"] }
 clap_complete = "4.5.57"
 clap_mangen = "0.2.29"
 color-eyre = "0.6.5"
@@ -20,7 +20,7 @@ itertools = "0.14.0"
 memmap2 = "0.9.7"
 mimalloc = "0.1.47"
 pretty_assertions = "1.4.1"
-rayon = "1.10.0"
+rayon = "1.11.0"
 regex = { version = "1.11.1", default-features = false, features = [
     "perf",
     "std",
@@ -30,7 +30,7 @@ rkyv = { version = "0.8.11", features = [
     "hashbrown-0_15",
     "smallvec-1",
 ] }
-rust-ini = "0.21.2"
+rust-ini = "0.21.1"
 smallvec = { version = "1.15.1", features = [
     "const_generics",
     "const_new",
@@ -38,7 +38,7 @@ smallvec = { version = "1.15.1", features = [
 ] }
 strsim = "0.11.1"
 tar = "0.4.44"
-thiserror = "2.0.14"
+thiserror = "2.0.15"
 tracing = "0.1.41"
 tracing-error = "0.2.1"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
