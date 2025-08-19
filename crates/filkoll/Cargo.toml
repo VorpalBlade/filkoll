@@ -8,7 +8,7 @@ name = "filkoll"
 readme = "../../README.md"
 repository = "https://github.com/VorpalBlade/filkoll"
 rust-version = "1.88.0"
-version = "0.2.6"
+version = "0.2.7"
 
 [dependencies]
 anstream.workspace = true
