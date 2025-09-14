@@ -56,7 +56,7 @@ impl LookupError {
         match self {
             Self::MissingCacheFiles => Some(format!(
                 "Run {}sudo filkoll update{} to create cache files, and if this is a new install \
-                 also `sudo systemctl enable filkoll.timer`",
+                 also `sudo systemctl enable filkoll-update.timer`",
                 anstyle::Color::Ansi(anstyle::AnsiColor::Blue)
                     .on_default()
                     .render(),
