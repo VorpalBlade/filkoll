@@ -8,6 +8,20 @@ edited).
 For a possibly more edited message focused on the binary please see the github
 releases.
 
+## [0.2.7] - 2025-09-14
+
+### 🐛 Bug fixes
+
+- Fix incorrect suggestion
+
+### 🩺 Diagnostics & output formatting
+
+- Improve message for no exact match
+
+### ⚙️ Other stuff
+
+- Update to Rust 1.88.0
+
 ## [0.2.6] - 2025-06-02
 
 ### 🩺 Diagnostics & output formatting
