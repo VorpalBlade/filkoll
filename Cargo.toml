@@ -7,7 +7,7 @@ anstream = "0.6.20"
 anstyle = "1.0.11"
 bstr = "1.12.0"
 camino = "1.2.0"
-clap = { version = "4.5.47", features = ["derive"] }
+clap = { version = "4.5.48", features = ["derive"] }
 clap_complete = "4.5.57"
 clap_mangen = "0.2.29"
 color-eyre = "0.6.5"
