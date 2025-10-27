@@ -67,7 +67,7 @@ jobs:
           echo "# Ld"
           ld -v
       - name: Install cross
-        uses: taiki-e/install-action@e43a5023a747770bfcb71ae048541a681714b951 # v2.62.33
+        uses: taiki-e/install-action@0ed4032d5406d133639ce4e858011eb498223338 # v2.62.39
         with:
           tool: cross@latest
       # TODO: Cache is broken for cross compiles, figure this out
@@ -92,7 +92,7 @@ jobs:
           fi
           tar cf filkoll.tar filkoll
           zstd -T0 -6 filkoll.tar
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         if: matrix.rust == 'stable' && contains(matrix.target, 'musl')
         with:
           name: filkoll_${{ matrix.target }}.tar.zst
@@ -142,7 +142,7 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           persist-credentials: false
-      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           name: filkoll_x86_64-unknown-linux-musl.tar.zst
       - name: Unpack binaries
