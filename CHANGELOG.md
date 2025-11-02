@@ -8,6 +8,13 @@ edited).
 For a possibly more edited message focused on the binary please see the github
 releases.
 
+## [0.2.8] - 2025-11-02
+
+### 🐛 Bug fixes
+
+- Add missing sync_all call
+
+
 ## [0.2.7] - 2025-09-14
 
 ### 🐛 Bug fixes
