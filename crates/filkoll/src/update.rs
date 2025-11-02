@@ -118,8 +118,13 @@ fn update_file(
 
     // Write data
     tracing::debug!("Writing {:?}", &tmp_path);
-    let writer = rkyv::ser::writer::IoWriter::new(&mut writer);
-    rkyv::api::high::to_bytes_in::<_, rkyv::rancor::Error>(&data_root, writer)?;
+    let rkyv_writer = rkyv::ser::writer::IoWriter::new(&mut writer);
+    rkyv::api::high::to_bytes_in::<_, rkyv::rancor::Error>(&data_root, rkyv_writer)?;
+    writer.flush().wrap_err("Failed to flush buffer")?;
+    let file = writer.into_inner()?;
+    // INVARIANT: Ensure data is on disk before the rename.
+    file.sync_all()
+        .wrap_err("Failed to sync file data to disk")?;
     tracing::info!("Wrote {:?}", &tmp_path);
     // INVARIANT: Rename to atomically update the file
     // This is a safety requirement to allow mmaping the file during lookup.
