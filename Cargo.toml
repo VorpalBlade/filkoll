@@ -7,13 +7,13 @@ anstream = "0.6.21"
 anstyle = "1.0.13"
 bstr = "1.12.1"
 camino = "1.2.2"
-clap = { version = "4.5.53", features = ["derive"] }
-clap_complete = "4.5.62"
+clap = { version = "4.5.54", features = ["derive"] }
+clap_complete = "4.5.65"
 clap_mangen = "0.2.31"
 color-eyre = "0.6.5"
 compact_str = { version = "0.9.0", features = ["smallvec"] }
 eyre = "0.6.12"
-flate2 = { version = "1.1.5", default-features = false, features = ["zlib-rs"] }
+flate2 = { version = "1.1.8", default-features = false, features = ["zlib-rs"] }
 hashbrown = "0.15.5"
 indoc = "2.0.7"
 itertools = "0.14.0"
@@ -25,7 +25,7 @@ regex = { version = "1.12.2", default-features = false, features = [
     "perf",
     "std",
 ] }
-rkyv = { version = "0.8.12", features = [
+rkyv = { version = "0.8.14", features = [
     "aligned",
     "hashbrown-0_15",
     "smallvec-1",
@@ -38,13 +38,13 @@ smallvec = { version = "1.15.1", features = [
 ] }
 strsim = "0.11.1"
 tar = "0.4.44"
-thiserror = "2.0.17"
+thiserror = "2.0.18"
 tracing = "0.1.44"
 tracing-error = "0.2.1"
 tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
 type_hash = "0.3.0"
 xz2 = { version = "0.1.7", features = ["static"] }
-zerocopy = { version = "0.8.28", features = ["derive"] }
+zerocopy = { version = "0.8.33", features = ["derive"] }
 zstd = "0.13.3"
 
 [workspace.lints.rust]
