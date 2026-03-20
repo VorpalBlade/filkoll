@@ -37,7 +37,7 @@ smallvec = { version = "1.15.1", features = [
     "union",
 ] }
 strsim = "0.11.1"
-tar = "0.4.44"
+tar = "0.4.45"
 thiserror = "2.0.18"
 tracing = "0.1.44"
 tracing-error = "0.2.1"
