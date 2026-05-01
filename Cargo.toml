@@ -7,8 +7,8 @@ anstream = "1.0.0"
 anstyle = "1.0.14"
 bstr = "1.12.1"
 camino = "1.2.2"
-clap = { version = "4.6.0", features = ["derive"] }
-clap_complete = "4.6.0"
+clap = { version = "4.6.1", features = ["derive"] }
+clap_complete = "4.6.2"
 clap_mangen = "0.2.33"
 color-eyre = "0.6.5"
 compact_str = { version = "0.9.0", features = ["smallvec"] }
@@ -18,14 +18,14 @@ hashbrown = "0.16.1"
 indoc = "2.0.7"
 itertools = "0.14.0"
 memmap2 = "0.9.10"
-mimalloc = "0.1.48"
+mimalloc = "0.1.50"
 pretty_assertions = "1.4.1"
-rayon = "1.11.0"
+rayon = "1.12.0"
 regex = { version = "1.12.3", default-features = false, features = [
     "perf",
     "std",
 ] }
-rkyv = { version = "0.8.15", features = [
+rkyv = { version = "0.8.16", features = [
     "aligned",
     "hashbrown-0_16",
     "smallvec-1",
