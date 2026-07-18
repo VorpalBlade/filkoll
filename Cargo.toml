@@ -11,12 +11,12 @@ clap = { version = "4.6.2", features = ["derive"] }
 clap_complete = "4.6.7"
 clap_mangen = "0.3.0"
 color-eyre = "0.6.5"
-compact_str = { version = "0.9.1", features = ["smallvec"] }
+compact_str = { version = "0.10.0", features = ["smallvec"] }
 eyre = "0.6.12"
 flate2 = { version = "1.1.9", default-features = false, features = ["zlib-rs"] }
-hashbrown = "0.16.1"
+hashbrown = "0.17.1"
 indoc = "2.0.7"
-itertools = "0.14.0"
+itertools = "0.15.0"
 memmap2 = "0.9.11"
 mimalloc = "0.1.52"
 pretty_assertions = "1.4.1"
@@ -27,7 +27,7 @@ regex = { version = "1.13.1", default-features = false, features = [
 ] }
 rkyv = { version = "0.8.17", features = [
     "aligned",
-    "hashbrown-0_16",
+    "hashbrown-0_17",
     "smallvec-1",
 ] }
 rust-ini = "0.21.3"
